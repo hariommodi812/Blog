@@ -1,17 +1,20 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from . import views
-
-router = DefaultRouter()
-router.register(r'categories', views.CategoryViewSet)
-router.register(r'authors', views.AuthorViewSet)
-router.register(r'blogs', views.BlogViewSet)
-router.register(r'comments', views.CommentViewSet)
+from django.urls import path
+from .views import (
+    BlogListView,
+    BlogDetailView,
+    FeaturedBlogView,
+    CommentListView,
+    CommentCreateView,
+    RelatedBlogsView,
+    BlogLikeView
+)
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('blogs/<int:blog_id>/comments/', views.get_blog_comments, name='blog-comments'),
-    path('countries/', views.CountryDataView.as_view(), name='countries-list'),
-    path('countries/<str:country_name>/', views.CountryDataView.as_view(), name='country-detail'),
-    path('independent-countries/', views.IndependentCountriesView.as_view(), name='independent-countries'),
+    path('', BlogListView.as_view(), name='blog-list'),
+    path('featured/', FeaturedBlogView.as_view(), name='featured-blog'),
+    path('<str:slug>/', BlogDetailView.as_view(), name='blog-detail'),
+    path('<str:slug>/like/', BlogLikeView.as_view(), name='blog-like'),
+    path('<str:slug>/related/', RelatedBlogsView.as_view(), name='related-blogs'),
+    path('<str:slug>/comments/', CommentListView.as_view(), name='comment-list'),
+    path('<str:slug>/comments/create/', CommentCreateView.as_view(), name='comment-create'),
 ]

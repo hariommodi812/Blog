@@ -1,6 +1,21 @@
 declare module 'connect-sqlite3' {
   import session from 'express-session';
-  export default function(session: typeof import('express-session')): session.Store;
+  
+  interface SQLiteStoreOptions {
+    db: string;
+    dir?: string;
+    table?: string;
+    concurrentDB?: boolean;
+    mode?: number;
+  }
+  
+  class SQLiteStore extends session.Store {
+    constructor(options: SQLiteStoreOptions);
+  }
+  
+  export default function(session: typeof import('express-session')): {
+    new (options?: SQLiteStoreOptions): SQLiteStore;
+  };
 }
 
 declare module 'better-sqlite3' {

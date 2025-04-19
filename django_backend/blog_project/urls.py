@@ -14,8 +14,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # API endpoints
     path('api/', include([
-        path('', include('blog.urls')),  # Blog API endpoints
+        path('blogs/', include('blog.urls')),  # Blog API endpoints
         path('auth/', include('accounts.urls')),  # Authentication API endpoints
+        # Add country API endpoints (direct access)
+        path('countries/', include([
+            path('', include('blog.country_urls')),
+        ])),
+        path('categories/', include('blog.category_urls')),
     ])),
     # Serve the React frontend
     path('', TemplateView.as_view(template_name='index.html')),

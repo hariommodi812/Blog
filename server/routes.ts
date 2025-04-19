@@ -1,11 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth } from "./auth";
 import axios from "axios";
 import { z } from "zod";
 import { insertCommentSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication routes
+  setupAuth(app);
+  
   // Prefix all routes with /api
   
   // Get all blog posts

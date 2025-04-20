@@ -4,7 +4,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from ..models import Category
-from ..serializers import CategorySerializer, BlogSerializer
+from ..serializers import CategorySerializer, BlogListSerializer as BlogSerializer
 
 class CategoryListView(APIView):
     """

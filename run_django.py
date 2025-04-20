@@ -1,129 +1,132 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import os
 import sys
-import subprocess
 import signal
+import django
 import time
 
 def signal_handler(sig, frame):
-    print('Shutting down Django server...')
+    print('Django server stopping...')
     sys.exit(0)
 
 def setup():
     """Setup Django environment"""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_project.settings')
+    
+    # Change to the Django project directory
     os.chdir('django_backend')
     
-    # Make migrations and migrate
-    subprocess.run([sys.executable, 'manage.py', 'makemigrations'], check=True)
-    subprocess.run([sys.executable, 'manage.py', 'migrate'], check=True)
-    
-    # Create a superuser
+    # Setup Django
     try:
-        subprocess.run([
-            sys.executable, 'manage.py', 'shell', '-c',
-            "from accounts.models import User; "
-            "User.objects.create_superuser('admin@example.com', 'admin123') "
-            "if not User.objects.filter(email='admin@example.com').exists() else None"
-        ])
-        print("Admin user created or already exists.")
+        django.setup()
+        print("Django environment set up successfully")
+        return True
     except Exception as e:
-        print(f"Error creating admin user: {e}")
-    
-    # Collect static files
-    subprocess.run([sys.executable, 'manage.py', 'collectstatic', '--noinput'], check=True)
+        print(f"Error setting up Django: {e}")
+        return False
 
 def seed_data():
     """Create initial data if needed"""
     try:
-        subprocess.run([
-            sys.executable, 'manage.py', 'shell', '-c',
-            """
-from blog.models import Category, Author, Blog
-from django.utils.text import slugify
-
-# Create categories if none exist
-if Category.objects.count() == 0:
-    print("Creating initial categories...")
-    categories = [
-        {"name": "Travel", "slug": "travel"},
-        {"name": "Technology", "slug": "technology"},
-        {"name": "Food", "slug": "food"},
-        {"name": "Lifestyle", "slug": "lifestyle"}
-    ]
-    for cat in categories:
-        Category.objects.create(**cat)
-
-# Create authors if none exist
-if Author.objects.count() == 0:
-    print("Creating initial authors...")
-    authors = [
-        {
-            "name": "Jane Smith",
-            "bio": "Travel enthusiast and writer",
-            "avatar": "https://randomuser.me/api/portraits/women/1.jpg",
-            "role": "Senior Editor"
-        },
-        {
-            "name": "John Doe",
-            "bio": "Tech blogger and software engineer",
-            "avatar": "https://randomuser.me/api/portraits/men/1.jpg",
-            "role": "Tech Contributor"
-        }
-    ]
-    for auth in authors:
-        Author.objects.create(**auth)
-
-# Create a sample blog if none exist
-if Blog.objects.count() == 0:
-    print("Creating a sample blog post...")
-    travel_cat = Category.objects.get(slug="travel")
-    jane = Author.objects.get(name="Jane Smith")
-    
-    Blog.objects.create(
-        title="Exploring the Hidden Gems of Tokyo",
-        slug="exploring-tokyo",
-        excerpt="Discover the lesser-known spots in Tokyo that tourists often miss.",
-        content="Tokyo is one of the most fascinating cities in the world...",
-        cover_image="https://images.unsplash.com/photo-1503899036084-c55cdd92da26",
-        category=travel_cat,
-        author=jane,
-        read_time=5,
-        is_featured=True,
-        tags=["tokyo", "japan", "travel", "asia"]
-    )
-            """
-        ])
-        print("Sample data created (if needed).")
+        # Import models after django setup
+        from blog.models import Category, Author, Blog
+        from accounts.models import User, Profile
+        
+        # Check if we need to create initial data
+        if Category.objects.count() == 0:
+            print("Creating initial categories...")
+            categories = [
+                Category(name="Travel", slug="travel"),
+                Category(name="Technology", slug="technology"),
+                Category(name="Lifestyle", slug="lifestyle"),
+                Category(name="Food", slug="food"),
+                Category(name="Business", slug="business")
+            ]
+            Category.objects.bulk_create(categories)
+            
+        if Author.objects.count() == 0:
+            print("Creating initial authors...")
+            authors = [
+                Author(name="John Doe", bio="Tech blogger and developer", role="Senior Writer"),
+                Author(name="Jane Smith", bio="Travel enthusiast and photographer", role="Contributing Writer")
+            ]
+            Author.objects.bulk_create(authors)
+            
+        if Blog.objects.count() == 0 and Category.objects.count() > 0 and Author.objects.count() > 0:
+            print("Creating initial blog posts...")
+            travel_category = Category.objects.get(slug="travel")
+            tech_category = Category.objects.get(slug="technology")
+            author1 = Author.objects.first()
+            author2 = Author.objects.last()
+            
+            Blog.objects.create(
+                title="Exploring the Hidden Gems of Tokyo: Beyond the Tourist Traps",
+                slug="exploring-tokyo-hidden-gems",
+                excerpt="Discover the lesser-known neighborhoods and secret spots that make Tokyo truly special.",
+                content="Tokyo is known for its bustling streets and popular attractions, but there's much more to explore beyond the typical tourist destinations...",
+                cover_image="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dG9reW98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=900&q=60",
+                category=travel_category,
+                author=author2,
+                is_featured=True,
+                tags=["Tokyo", "Japan", "Travel", "Hidden Gems"]
+            )
+            
+            Blog.objects.create(
+                title="The Future of AI: How Machine Learning is Transforming Industries",
+                slug="future-of-ai-transforming-industries",
+                excerpt="An in-depth look at how artificial intelligence is revolutionizing various sectors.",
+                content="Artificial intelligence and machine learning technologies are rapidly evolving and reshaping how businesses operate across all industries...",
+                cover_image="https://images.unsplash.com/photo-1589254065878-42c9da997008?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGFydGlmaWNpYWwlMjBpbnRlbGxpZ2VuY2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=900&q=60",
+                category=tech_category,
+                author=author1,
+                tags=["AI", "Machine Learning", "Technology", "Innovation"]
+            )
+            
+        print("Initial data check complete")
+        return True
     except Exception as e:
-        print(f"Error creating sample data: {e}")
+        print(f"Error seeding data: {e}")
+        return False
+
+def apply_migrations():
+    """Apply database migrations"""
+    try:
+        from django.core.management import execute_from_command_line
+        print("Applying migrations...")
+        execute_from_command_line(['manage.py', 'migrate'])
+        return True
+    except Exception as e:
+        print(f"Error applying migrations: {e}")
+        return False
 
 def main():
     """Run Django server with correct settings."""
-    # Register signal handler for graceful shutdown
     signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_project.settings')
     
-    # Setup Django
-    setup()
+    # Change to the Django project directory
+    os.chdir('django_backend')
     
-    # Create initial data
-    seed_data()
+    # Apply migrations and seed data
+    if not apply_migrations():
+        print("Failed to apply migrations. Exiting.")
+        return
     
-    # Run the server
-    print("Starting Django server on port 8000...")
-    process = subprocess.Popen([
-        sys.executable, 'manage.py', 'runserver', 
-        '0.0.0.0:8000'
-    ])
+    if not setup():
+        print("Failed to set up Django environment. Exiting.")
+        return
     
-    try:
-        while True:
-            # Keep the script running
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("Shutting down Django server...")
-        process.terminate()
-        process.wait()
+    if not seed_data():
+        print("Warning: Failed to seed initial data, but continuing...")
+    
+    print("\nStarting Django server...")
+    # Set the server to run on 0.0.0.0 to be accessible externally
+    from django.core.management import execute_from_command_line
+    execute_from_command_line(['manage.py', 'runserver', '0.0.0.0:8000'])
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Django server stopped by user.")
+        sys.exit(0)

@@ -17,8 +17,17 @@ def setup():
     """Setup Django environment"""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_project.settings')
     
-    # Change to the Django project directory
-    os.chdir('django_backend')
+    # Change to the Django project directory if it exists
+    if os.path.exists('django_backend'):
+        os.chdir('django_backend')
+    elif os.path.exists('../django_backend'):
+        os.chdir('../django_backend')
+    else:
+        print("Django backend directory not found!")
+        # List current directory contents for debugging
+        print("Current directory:", os.getcwd())
+        print("Contents:", os.listdir())
+        return False
     
     # Setup Django
     try:
@@ -109,9 +118,6 @@ def main():
     
     # Set up the Django settings module
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_project.settings')
-    
-    # Change to the Django project directory
-    os.chdir('django_backend')
     
     # Apply migrations and seed data
     if not setup():

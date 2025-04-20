@@ -5,6 +5,10 @@ import signal
 import django
 import time
 
+# Add the django_backend directory to the Python path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(BASE_DIR, 'django_backend'))
+
 def signal_handler(sig, frame):
     print('Django server stopping...')
     sys.exit(0)
@@ -102,18 +106,20 @@ def apply_migrations():
 def main():
     """Run Django server with correct settings."""
     signal.signal(signal.SIGINT, signal_handler)
+    
+    # Set up the Django settings module
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_project.settings')
     
     # Change to the Django project directory
     os.chdir('django_backend')
     
     # Apply migrations and seed data
-    if not apply_migrations():
-        print("Failed to apply migrations. Exiting.")
-        return
-    
     if not setup():
         print("Failed to set up Django environment. Exiting.")
+        return
+        
+    if not apply_migrations():
+        print("Failed to apply migrations. Exiting.")
         return
     
     if not seed_data():

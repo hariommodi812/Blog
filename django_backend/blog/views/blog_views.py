@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import F
 
 from ..models import Blog, Category
-from ..serializers import BlogSerializer, CommentSerializer
+from ..serializers import BlogListSerializer as BlogSerializer, CommentSerializer
 
 class BlogListView(APIView):
     """

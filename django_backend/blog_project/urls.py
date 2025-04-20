@@ -1,9 +1,3 @@
-"""
-URL configuration for blog_project project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-"""
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -16,10 +10,7 @@ urlpatterns = [
     path('api/', include([
         path('blogs/', include('blog.urls')),  # Blog API endpoints
         path('auth/', include('accounts.urls')),  # Authentication API endpoints
-        # Add country API endpoints (direct access)
-        path('countries/', include([
-            path('', include('blog.country_urls')),
-        ])),
+        path('countries/', include('blog.country_urls')),
         path('categories/', include('blog.category_urls')),
     ])),
     # Serve the React frontend
@@ -30,12 +21,3 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-from django.contrib import admin
-from django.urls import path, include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/countries/', include('blog.country_urls')),
-    path('api/', include('blog.urls')),
-    path('api/categories/', include('blog.category_urls')),
-]

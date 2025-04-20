@@ -22,6 +22,10 @@ const Header = () => {
   const handleLogin = () => {
     navigate("/auth");
   };
+  
+  const handleSignup = () => {
+    navigate("/auth?tab=register");
+  };
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -109,7 +113,7 @@ const Header = () => {
                 <div className="hidden md:block">
                   <Button 
                     className="px-4 py-2 rounded-md bg-primary text-white font-medium hover:bg-primary/90 transition-colors"
-                    onClick={handleLogin}
+                    onClick={handleSignup}
                   >
                     Sign up
                   </Button>
@@ -179,7 +183,7 @@ const Header = () => {
                       </Button>
                       <Button 
                         className="flex-1 px-4 py-2 text-center rounded-md bg-primary text-white font-medium hover:bg-primary/90 transition-colors"
-                        onClick={handleLogin}
+                        onClick={handleSignup}
                       >
                         Sign up
                       </Button>

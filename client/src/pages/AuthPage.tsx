@@ -39,7 +39,10 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const AuthPage = () => {
-  const [activeTab, setActiveTab] = useState("login");
+  const [location] = useLocation();
+  const searchParams = new URLSearchParams(location.split('?')[1] || '');
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabParam === 'register' ? 'register' : 'login');
   const [_, navigate] = useLocation();
   const { toast } = useToast();
 

@@ -1,6 +1,6 @@
-# BlogBuddy-3
+# BlogBuddy
 
-BlogBuddy-3 is a full-stack web application that allows users to create, manage, and view blog posts with a seamless user experience. It includes a Django backend, a modern frontend, and structured API communication between client and server.
+BlogBuddy is a full-stack web application that allows users to create, manage, and view blog posts with a seamless user experience. It includes a Django backend, a modern frontend, and structured API communication between client and server.
 
 ---
 
@@ -17,7 +17,7 @@ BlogBuddy-3 is a full-stack web application that allows users to create, manage,
 ## 🗂 Project Structure
 
 ```
-BlogBuddy-3/
+BlogBuddy/
 ├── client/              # Frontend client
 ├── django_backend/      # Django backend
 ├── server/              # Node server / API gateway
@@ -37,8 +37,8 @@ BlogBuddy-3/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/BlogBuddy-3.git
-cd BlogBuddy-3
+git clone https://github.com/your-username/BlogBuddy.git
+cd BlogBuddy
 ```
 
 ### 2. Backend Setup (Django)
